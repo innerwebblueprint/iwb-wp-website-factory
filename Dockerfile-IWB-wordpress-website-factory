@@ -1,0 +1,83 @@
+# syntax=docker/dockerfile:1
+
+## Some convient commands
+
+# Version dev1.009 ~ git reduction + Storj expansion 
+# Version beta1.000 ~ first beta release
+
+# iwbVersion=latest
+# iwbVersion=dev1.009
+#iwbVersion=beta1.000
+
+# docker build --no-cache -t iwbp/iwbwpwebsitefactory:$iwbVersion -f Dockerfile-IWB-wordpress-website-factory .
+
+
+## This is a 'Dodckerfile' used to build a docker image
+## Build using the command, docker build -t IMAGE_NAME .
+## for example 'docker build -t websitefactory .'
+## docker build --no-cache -t websitefactory .
+## docker build --no-cache -t websitefactory -f filename .
+## When you 'run' a docker image, you get a docker instance of that image
+## Run the image as docker run IMAGE_NAME -p 22:2222 to test
+## Usually you will run this as a docker compose with a yaml file.
+
+FROM wordpress
+
+# Use the default production configuration
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+
+## PHP custom directives
+COPY includes/custom.ini $PHP_INI_DIR/conf.d/
+
+# Install some additional things we will need
+## I'm adding nano in here so I can edit the config file
+
+## Not sure I need git anymore... consider ditching it
+
+RUN apt-get update && apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    supervisor \
+    cron \
+    default-mysql-client \
+    git \
+    libxml2-dev \
+    nano \
+    ncdu \
+    zip
+
+## Install custom php extensions
+RUN docker-php-ext-install pdo pdo_mysql soap
+
+## install Storj Uplink
+RUN curl -L https://github.com/storj/storj/releases/latest/download/uplink_linux_amd64.zip -o uplink_linux_amd64.zip \
+    && unzip -o uplink_linux_amd64.zip \
+    && install uplink /usr/local/bin/uplink \
+    && rm uplink_linux_amd64.zip \
+    && rm uplink
+
+## install wp-cli
+## note: use 
+## alias wp='wp --allow-root'
+## when testing in docker cli
+RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+    && chmod +x wp-cli.phar \
+    && mv wp-cli.phar /usr/local/bin/wp
+
+## Setup supervisord, see supervisord.conf
+RUN mkdir -p /var/log/supervisord
+COPY includes/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+## Setup our processing scripts, both in /usr/local/bin/
+## iwb-websitefactory.sh ~ startup script / docker entry point which is run first by supervisord
+## IWB-flow.py ~ not using this one really right now might later
+## IWB-wp-flow.py ~ This is the wordpress backup script
+COPY includes/iwb-websitefactory.sh /usr/local/bin/
+COPY includes/IWB-flow.py /usr/local/bin/
+COPY includes/IWB-wp-flow.py /usr/local/bin/
+COPY includes/wp-config-docker.php /usr/src/wordpress/wp-config-docker.php
+RUN chmod +x /usr/local/bin/iwb-websitefactory.sh  /usr/local/bin/IWB-wp-flow.py \
+    && chmod +x /usr/local/bin/IWB-flow.py
+
+CMD ["/usr/bin/supervisord"]

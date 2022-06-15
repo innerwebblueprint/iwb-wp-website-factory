@@ -1,0 +1,54 @@
+version: '3.1'
+
+##
+# This is a sample docker compose file for use with the IWB WebsiteFactory.
+# This file requires edits noted below before it will work.
+# Please edit accordingly, things that need editing are inside [brackets].
+# Remove the brackets, they are only for notaton.
+# Usage:
+# docker-compose -f the-name-of-this-file.yml up
+# or
+# docker-compose up (if the file is named docker-compose.yml and your in the same directory your calling it from)
+
+services:
+  wordpress:
+    image: iwbp/iwbwpwebsitefactory:latest
+    restart: always
+    ports:
+      - 80:80
+    environment:
+      DOMAIN_NAME: [www.example.com]
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: [database name for your wordpress (you can make this up)]
+      WORDPRESS_DB_USER: [database user name (you can make this up - it can be the same as the db name)]
+      WORDPRESS_DB_PASSWORD: [database password (you make this up)]
+      WORDPRESS_WP_SITEURL: [http://www.example.com]
+      WORDPRESS_WP_HOME: [http://www.example.com]
+      STORJ_GRANT: [see course instructions on how to get: https://www.innerwebblueprint.com/go/github/iwb-website-factory-pre-requisites/]
+      STORJ_WPOPS_BUCKET: [see course instructions on how to get: https://www.innerwebblueprint.com/go/github/iwb-website-factory-pre-requisites/]
+      IWB_DAILY_DB_RETENTION: 7 #in days, save 7 days
+      IWB_WEEKLY_DB_RETENTION: 28
+      IWB_MONTHLY_DB_RETENTION: 360
+      IWB_YEARLY_DB_RETENTION: 3650
+      IWB_DAILY_HTML_RETENTION: 2 #in days, save 2 days
+      IWB_WEEKLY_HTML_RETENTION: 28
+      IWB_MONTHLY_HTML_RETENTION: 60
+      IWB_YEARLY_HTML_RETENTION: 365
+      
+    volumes:
+      - wordpress:/var/www/html
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: [database name for your wordpress (same as above)]
+      MYSQL_USER: [database user name (same as above)]
+      MYSQL_PASSWORD: [database password (same as above)]
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  wordpress:
+  db:
