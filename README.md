@@ -10,7 +10,7 @@ iwbp/iwb-wp-website-factory
 
 This image is based off the offical 'wordpress' image and add's a distributed cloud storage layer using Storj. It also includes some 'backend' scripting to handle automated backup and restores using the distributed cloud storage layer.
 
-It automatically backs up a wordpress site, files and database, to Storj. The image also restores a wordpress site to it's last backed up state on a newly deployed docker container, pulling Storj encrypted persistent distributed storage.
+It automatically backs up a wordpress site, files and database, to Storj. The image also restores a wordpress site to it's last backed up state on a newly deployed docker container, pulling from Storj encrypted persistent distributed storage.
 
 I originally put this together to host on the Akash distributed compute cloud, however this will work pretty much anywhere you can run a docker image. Linode is my preferred choice as it currently outperforms almost all providers on Akash. I hope that will eventually change.
 
