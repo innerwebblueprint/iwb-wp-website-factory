@@ -16,6 +16,10 @@ I originally put this together to host on the Akash distributed compute cloud, h
 
 You can use the image, without building it yourself, it's up on Docker Hub.
 
-see: http://www.innerwebblueprint.com/iwb-wp-website-factory for more explanation on how to use the image, why I made it, the problems it solves, and how it might benefit you.
+see: 
+
+https://www.innerwebblueprint.com/go/github/iwb-wp-website-factory/
+
+for more explanation on how to use the image, why I made it, the problems it solves, and how it might benefit you.
 
 This repository includes everything required to build the image. It also includes an example docker-compose.yml file with notes on private enviornment variables required.
