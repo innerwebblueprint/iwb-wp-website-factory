@@ -3,11 +3,11 @@
 ## Some convient commands
 
 # Version dev1.009 ~ git reduction + Storj expansion 
-# Version beta1.000 ~ first beta release
+# Version beta1.001 ~ Beempy incorporated
 
 # iwbVersion=latest
 # iwbVersion=dev1.009
-#iwbVersion=beta1.000
+#iwbVersion=beta1.001
 
 # docker build --no-cache -t iwbp/iwbwpwebsitefactory:$iwbVersion -f Dockerfile-IWB-wordpress-website-factory .
 
@@ -43,9 +43,20 @@ RUN apt-get update && apt-get install -y \
     default-mysql-client \
     git \
     libxml2-dev \
+    zip \
+    python3-distutils \
+    python3-apt \
+    python3-dev \
+    build-essential \
+    libssl-dev \
     nano \
-    ncdu \
-    zip
+    ncdu
+
+## Install pip package manager for python    
+RUN curl https://bootstrap.pypa.io/get-pip.py -o ~/get-pip.py \
+    && python3 ~/get-pip.py \
+    && pip install -U cryptography \
+    && pip install -U beem
 
 ## Install custom php extensions
 RUN docker-php-ext-install pdo pdo_mysql soap
