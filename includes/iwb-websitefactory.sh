@@ -62,7 +62,7 @@ fi
 ## Check for $datasetHtmlOverwrite directive.
 ## If NOT set to 'nooverwrite' we download the latest backup of the sites files
 ## from Storj. (gotta love the double negatives LOL)
-if [ $datasetHtmlOverwrite != 'nooverwrite']; then
+if [ $datasetHtmlOverwrite != 'nooverwrite' ]; then
     echo 'Attempting download: '$storjHtmlObj
     echo 'This may take a moment depending on archive size and available bandiwidth...'
 
