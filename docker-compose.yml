@@ -1,5 +1,7 @@
 version: '3.1'
 
+## IWB internal version - see github repo for version tag 
+
 ##
 # This is a sample docker compose file for use with the IWB WebsiteFactory.
 # This file requires edits noted below before it will work.
@@ -34,7 +36,9 @@ services:
       IWB_WEEKLY_HTML_RETENTION: 28
       IWB_MONTHLY_HTML_RETENTION: 60
       IWB_YEARLY_HTML_RETENTION: 365
-      
+      DATASET_HTML_OVERWRITE: [yes,no]
+      DATASET_DB_OVERWRITE: [yes,no]
+      DATASET_DB_IMPORT: [yes,no]
     volumes:
       - wordpress:/var/www/html
 

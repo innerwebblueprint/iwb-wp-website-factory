@@ -14,10 +14,14 @@
 
 echo 'Initializing IWB enviormnet'
 
-## Stting static Variables
+## Static String Variables
 downloadPath='/var/download'
 extractPath='/var/download/extract'
 webRootPath='/var/www/html'
+## Enviornment dependent variables
+datasetHtmlOverwrite=${DATASET_HTML_OVERWRITE}
+datasetDbOverwrite=${DATASET_DB_OVERWRITE}
+datasetDbImport=${DATASET_DB_IMPORT}
 ServerName=${DOMAIN_NAME}
 domainName=${DOMAIN_NAME}
 htmlLatestFileName=$domainName"_wp_html_latest.tar.gz"
@@ -52,54 +56,58 @@ fi
 ## Verify Storj Connectivity
 
 ##  Download site html backup archive from Storj
+##  if this fails... likely because of a first install...
+##  we check later and download wordpress.
 
-## To-Do: 
-## Check that the configured sites HTML backup archive exists
-##  If it does not, must be a new install
-##      download wordpress core instead
+## Check for $datasetHtmlOverwrite directive.
+## If set to 'yes' we download the latest backup of the sites files
+## from Storj.
+if [ $datasetHtmlOverwrite == 'yes']; then
+    echo 'Attempting download: '$storjHtmlObj
+    echo 'This may take a moment depending on archive size and available bandiwidth...'
 
-echo 'Attempting download: '$storjHtmlObj
-echo 'This may take a moment depending on archive size and available bandiwidth...'
+    ## Attempt to download
+    uplink cp --config-dir $storjConfigPath --access $storjAccessGrant $storjHtmlObj $downloadPath || echo 'Download failed... will attempt fresh wordpress install'
 
-## Attempt to download
-uplink cp --config-dir $storjConfigPath --access $storjAccessGrant $storjHtmlObj $downloadPath || echo 'Download failed... will attempt fresh wordpress install'
+    if [ -f $downloadPath/$htmlLatestFileName ];
+        then
+            echo "$htmlLatestFileName found"
+            echo 'Download complete...'
+            ## Extract to correct location 
+            echo '     '
+            echo 'Extracting : '$downloadPath/$htmlLatestFileName' To: '$extractPath
+            tar -xf $downloadPath/$htmlLatestFileName -C $extractPath &&
+            echo 'Extraction complete...'
+            ## Copy files to the correct location 
+            ## I'll delete them later on during cleanup
+            echo 'Relocating files to web root'
+            cp -r $extractPath/. $webRootPath &&
+            #cp -r $extractPath/* $webRootPath &&
+            echo "Files relocated..."
+        else
+            echo "$htmlLatestFileName not found."
+            echo "Attempting fresh wordpress install"
+            echo "Downloading wp now"
+            wp --path='/var/www/html/' --allow-root core download &&
+            echo "WP downloaded..."
+    fi
 
-if [ -f $downloadPath/$htmlLatestFileName ];
-    then
-        echo "$htmlLatestFileName found"
-        echo 'Download complete...'
-        ## Extract to correct location 
-        echo '     '
-        echo 'Extracting : '$downloadPath/$htmlLatestFileName' To: '$extractPath
-        tar -xf $downloadPath/$htmlLatestFileName -C $extractPath &&
-        echo 'Extraction complete...'
-        ## Copy files to the correct location 
-        ## I'll delete them later on during cleanup
-        echo 'Relocating files to web root'
-        cp -r $extractPath/. $webRootPath &&
-        #cp -r $extractPath/* $webRootPath &&
-        echo "Files relocated..."
-    else
-        echo "$htmlLatestFileName not found."
-        echo "Attempting fresh wordpress install"
-        echo "Downloading wp now"
-        wp --path='/var/www/html/' --allow-root core download &&
-        echo "WP downloaded..."
+    # Setting up wp-config file for wordpress
+    echo 'Setting up wp-config file for wordpress'
+    wpConfigFile="/var/www/html/wp-config.php"
+    echo "Checking for $wpConfigFile"
+    if [ -f "$wpConfigFile" ];
+        then
+            echo "$wpConfigFile found"
+        else
+            echo "$wpConfigFile NOT found..."
+            echo "Copy wordpress config env version into place"
+            cp /usr/src/wordpress/wp-config-docker.php /var/www/html/wp-config.php &&
+            echo "Config file copied"
+    fi
 fi
 
-# Setting up wp-config file for wordpress
-echo 'Setting up wp-config file for wordpress'
-wpConfigFile="/var/www/html/wp-config.php"
-echo "Checking for $wpConfigFile"
-if [ -f "$wpConfigFile" ];
-    then
-        echo "$wpConfigFile found"
-    else
-        echo "$wpConfigFile NOT found..."
-        echo "Copy wordpress config env version into place"
-        cp /usr/src/wordpress/wp-config-docker.php /var/www/html/wp-config.php &&
-        echo "Config file copied"
-fi
+## @todo - make this conditional on $datasetDbOverwrite
 
 # Download latest db backup file
 echo 'Downloading: ' $storjdbObj
