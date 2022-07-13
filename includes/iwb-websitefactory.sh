@@ -60,9 +60,9 @@ fi
 ##  we check later and download wordpress.
 
 ## Check for $datasetHtmlOverwrite directive.
-## If set to 'yes' we download the latest backup of the sites files
-## from Storj.
-if [ $datasetHtmlOverwrite == 'yes']; then
+## If NOT set to 'nooverwrite' we download the latest backup of the sites files
+## from Storj. (gotta love the double negatives LOL)
+if [ $datasetHtmlOverwrite != 'nooverwrite']; then
     echo 'Attempting download: '$storjHtmlObj
     echo 'This may take a moment depending on archive size and available bandiwidth...'
 
@@ -107,7 +107,8 @@ if [ $datasetHtmlOverwrite == 'yes']; then
     fi
 fi
 
-## @todo - make this conditional on $datasetDbOverwrite
+## @todo - make this conditional on $datasetDbOverwrite = overwrite
+## actually make overwrite the default, and nooverwrite skip
 
 # Download latest db backup file
 echo 'Downloading: ' $storjdbObj
