@@ -1,5 +1,7 @@
 version: '3.1'
 
+## IWB internal version - see github repo for version tag 
+
 ##
 # This is a sample docker compose file for use with the IWB WebsiteFactory.
 ##
