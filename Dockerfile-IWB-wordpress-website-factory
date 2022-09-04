@@ -3,11 +3,13 @@
 ## Some convient commands
 
 # Version dev1.009 ~ git reduction + Storj expansion 
+# Version beta1.002 ~ Don't run me over!
 # Version beta1.001 ~ Beempy incorporated
+
 
 # iwbVersion=latest
 # iwbVersion=dev1.009
-#iwbVersion=beta1.001
+#iwbVersion=beta1.002
 
 # docker build --no-cache -t iwbp/iwbwpwebsitefactory:$iwbVersion -f Dockerfile-IWB-wordpress-website-factory .
 

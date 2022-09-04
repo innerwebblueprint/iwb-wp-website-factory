@@ -2,13 +2,30 @@ version: '3.1'
 
 ##
 # This is a sample docker compose file for use with the IWB WebsiteFactory.
-# This file requires edits noted below before it will work.
+##
+
+# This file requires edits noted below with [thing-that-needs-editing] before it will work.
 # Please edit accordingly, things that need editing are inside [brackets].
 # Remove the brackets, they are only for notaton.
-# Usage:
-# docker-compose -f the-name-of-this-file.yml up
+#
+# Usage once complete:
+# docker-compose -f path/the-name-of-this-file.yml up
 # or
-# docker-compose up (if the file is named docker-compose.yml and your in the same directory your calling it from)
+# docker-compose up to bring up docker-compose.yml in the current working directory.
+
+## Some additional notes:
+# In the enviornmnet variables below:
+# Set DATASET_HTML_OVERWRITE: yes
+#   If you want to pull your html files from distributed storage.
+#   for 'production' this should be set to yes.
+# Set DATASET_DB_OVERWRITE: yes
+#   If you want to pull your database from distributed storage.
+#   for 'production' this should be set to yes.
+# Set DATASET_DB_IMPORT: yes
+#   to import the distributed storage on start
+#   for 'production' this should be set to yes.
+## The no settings for these variables are primarily used for testing
+## and or converting a non IWB site into an IWB containerized platform.
 
 services:
   wordpress:
@@ -34,9 +51,16 @@ services:
       IWB_WEEKLY_HTML_RETENTION: 28
       IWB_MONTHLY_HTML_RETENTION: 60
       IWB_YEARLY_HTML_RETENTION: 365
-      
+      DATASET_HTML_OVERWRITE: [yes,no]
+      DATASET_DB_OVERWRITE: [yes,no]
+      DATASET_DB_IMPORT: [yes,no]
     volumes:
       - wordpress:/var/www/html
+      ## For a bind mount to local storage use:
+      ## comment out - wordpress:/var/www/html
+      ## configure and uncomment out the line below:
+      ##- path/to/folder/wordpress:/var/www/html
+      ##- ~/development/docker-bind-mounts/cfu:/var/www/html
 
   db:
     image: mysql:5.7
