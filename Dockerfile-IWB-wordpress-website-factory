@@ -1,18 +1,25 @@
 # syntax=docker/dockerfile:1
 
-## Some convient commands
+## Some convient build commands
 
-# Version dev1.009 ~ git reduction + Storj expansion 
-# Version beta1.002 ~ Don't run me over!
-# Version beta1.001 ~ Beempy incorporated
-
+# Build latest:
 
 # iwbVersion=latest
-# iwbVersion=dev1.009
-#iwbVersion=beta1.002
-
 # docker build --no-cache -t iwbp/iwbwpwebsitefactory:$iwbVersion -f Dockerfile-IWB-wordpress-website-factory .
 
+# Build specific version number:
+
+## Version beta1.002 ~ Don't run me over!
+
+# iwbVersion=beta1.002
+# docker build --no-cache -t iwbp/iwbwpwebsitefactory:$iwbVersion -f Dockerfile-IWB-wordpress-website-factory .
+
+## Version beta1.001 ~ Beempy incorporated
+
+## Version dev1.009 ~ git reduction + Storj expansion
+
+# iwbVersion=dev1.009
+# docker build --no-cache -t iwbp/iwbwpwebsitefactory:$iwbVersion -f Dockerfile-IWB-wordpress-website-factory .
 
 ## This is a 'Dodckerfile' used to build a docker image
 ## Build using the command, docker build -t IMAGE_NAME .
