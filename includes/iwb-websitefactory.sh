@@ -84,45 +84,24 @@ if [ $datasetHtmlOverwrite != 'nooverwrite' ]; then
             cp -r $extractPath/. $webRootPath &&
             #cp -r $extractPath/* $webRootPath &&
             echo "Files relocated..."
-        else
-            echo "$htmlLatestFileName not found."
-            echo "Attempting fresh wordpress install"
-            echo "Downloading wp now"
-            wp --path='/var/www/html/' --allow-root core download &&
-            echo "WP downloaded..."
-    fi
-
-    # Setting up wp-config file for wordpress
-    echo 'Setting up wp-config file for wordpress'
-    wpConfigFile="/var/www/html/wp-config.php"
-    echo "Checking for $wpConfigFile"
-    if [ -f "$wpConfigFile" ];
-        then
-            echo "$wpConfigFile found"
-        else
-            echo "$wpConfigFile NOT found..."
-            echo "Copy wordpress config env version into place"
-            cp /usr/src/wordpress/wp-config-docker.php /var/www/html/wp-config.php &&
-            echo "Config file copied"
     fi
 fi
 
-## @todo - make this conditional on $datasetDbOverwrite = overwrite
-## actually make overwrite the default, and nooverwrite skip
+if [ $datasetDbOverwrite != 'nooverwrite' ]; then
+    # Download latest db backup file
+    echo 'Downloading: ' $storjdbObj
+    uplink cp --config-dir $storjConfigPath --access $storjAccessGrant $storjdbObj $downloadPath &&
 
-# Download latest db backup file
-echo 'Downloading: ' $storjdbObj
-uplink cp --config-dir $storjConfigPath --access $storjAccessGrant $storjdbObj $downloadPath &&
+    # Extract file
+    echo 'Extracting: ' $storjdbObj
+    gunzip -f $downloadPath/$dbLatestFileName &&
+    echo 'Extracting complete. ' $storjdbObj
+fi
 
-# Extract file
-echo 'Extracting: ' $storjdbObj
-gunzip -f $downloadPath/$dbLatestFileName &&
-echo 'Extracting complete. ' $storjdbObj
-
-## Now import the database if there is one
-echo "Checking for database file $dbLatestFileName"
-
-if [ -f $downloadPath/$dbLatestImportName ];
+if [ $datasetDbImport != 'noimport' ]; then
+    ## Now import the database if there is one
+    echo "Checking for database file $dbLatestFileName"
+    if [ -f $downloadPath/$dbLatestImportName ];
     then
         echo "$dbLatestImportName found"
         echo "Importing wp db from backup"
@@ -133,6 +112,28 @@ if [ -f $downloadPath/$dbLatestImportName ];
         echo "You will need to install wordpress"
         ## To-Do: 
         ## Auto install wordpress with supplied enviornmnet variables
+    fi
+fi
+
+# Setting up wp-config file for wordpress
+echo 'Setting up wp-config file for wordpress'
+wpConfigFile="/var/www/html/wp-config.php"
+
+echo "Checking for $wpConfigFile"
+if [ -f "$wpConfigFile" ];
+    then
+        echo "$wpConfigFile found"
+    else
+        echo "$wpConfigFile NOT found..."
+        echo "Copy wordpress config env version into place"
+        cp /usr/src/wordpress/wp-config-docker.php /var/www/html/wp-config.php &&
+        echo "Config file copied"
+        if ! wp --path='/var/www/html/' --allow-root core is-installed; then
+            echo "Attempting fresh wordpress install"
+            echo "Downloading wp now"
+            wp --path='/var/www/html/' --allow-root core download &&
+            echo "WP downloaded..."
+        fi
 fi
 
 echo "Cleaning up working files..."
