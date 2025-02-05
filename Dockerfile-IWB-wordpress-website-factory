@@ -30,7 +30,7 @@
 ## Run the image as docker run IMAGE_NAME -p 22:2222 to test
 ## Usually you will run this as a docker compose with a yaml file.
 
-FROM wordpress
+FROM wordpress:6.1.1-php8.2-apache
 
 # Use the default production configuration
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
