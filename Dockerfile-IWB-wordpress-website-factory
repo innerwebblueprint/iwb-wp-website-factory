@@ -7,6 +7,12 @@
 # iwbVersion=latest
 # docker build --no-cache -t iwbp/iwbwpwebsitefactory:$iwbVersion -f Dockerfile-IWB-wordpress-website-factory .
 
+# Build dev:
+
+# iwbVersion=dev
+# docker build --no-cache -t iwbp/iwbwpwebsitefactory:$iwbVersion -f Dockerfile-IWB-wordpress-website-factory .
+
+
 # Build specific version number:
 
 ## Version beta1.002 ~ Don't run me over!
