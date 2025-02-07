@@ -18,7 +18,7 @@
 
 ## Version dev1.009 ~ git reduction + Storj expansion
 
-# iwbVersion=dev1.009
+# iwbVersion=dev1.011
 # docker build --no-cache -t iwbp/iwbwpwebsitefactory:$iwbVersion -f Dockerfile-IWB-wordpress-website-factory .
 
 ## This is a 'Dodckerfile' used to build a docker image
@@ -60,6 +60,14 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     nano \
     ncdu
+
+# Install Redis for object caching
+RUN apt-get update && apt-get install -y redis-server && \
+    rm -rf /var/lib/apt/lists/*
+
+# Configure Redis for persistence
+RUN echo "save 60 1" >> /etc/redis/redis.conf && \
+    echo "appendonly yes" >> /etc/redis/redis.conf
 
 ## Install pip package manager for python    
 RUN curl https://bootstrap.pypa.io/get-pip.py -o ~/get-pip.py \
