@@ -1,0 +1,83 @@
+##
+# This is a sample docker compose file for use with the IWB WebsiteFactory.
+##
+
+# PID Docker Compose (PID stands for project ID)
+
+# sudo docker compose -f docker-compose_iwb-PID.yml up &
+# sudo docker compose -f docker-compose_iwb-PID.yml down --volumes
+
+# sudo docker exec -it PID-wordpress /bin/bash
+
+
+# This file requires edits noted below with [thing-that-needs-editing] before it will work.
+
+# Please edit accordingly and remove the brackets:
+# for example:
+# [put what's expected in here]
+# becomes
+# put what's expected in here
+
+## Some additional notes:
+# In the enviornmnet variables below:
+# Set DATASET_HTML_OVERWRITE: yes
+#   If you want to pull your html files from distributed storage.
+#   for 'production' this should be set to yes.
+# Set DATASET_DB_OVERWRITE: yes
+#   If you want to pull your database from distributed storage.
+#   for 'production' this should be set to yes.
+# Set DATASET_DB_IMPORT: yes
+#   to import the distributed storage on start
+#   for 'production' this should be set to yes.
+## The no settings for these variables are primarily used for testing
+## and or converting a non IWB site into an IWB containerized platform.
+
+services:
+  wordpress:
+    image: iwbp/iwbwpwebsitefactory:dev
+    restart: always
+    ports:
+      - [ipaddress]80:80
+    environment:
+      DOMAIN_NAME: [www.example.com]
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: [database name for your wordpress (you can make this up)]
+      WORDPRESS_DB_USER: [database user name (you can make this up - it can be the same as the db name)]
+      WORDPRESS_DB_PASSWORD: [database password (you make this up)]
+      WORDPRESS_WP_SITEURL: [http://www.example.com]
+      WORDPRESS_WP_HOME: [http://www.example.com]
+      STORJ_GRANT: [see course instructions on how to get: https://www.innerwebblueprint.com/go/github/iwb-website-factory-pre-requisites/]
+      STORJ_WPOPS_BUCKET: [see course instructions on how to get: https://www.innerwebblueprint.com/go/github/iwb-website-factory-pre-requisites/]
+      IWB_DAILY_DB_RETENTION: 7 #in days, save 7 days
+      IWB_WEEKLY_DB_RETENTION: 28
+      IWB_MONTHLY_DB_RETENTION: 360
+      IWB_YEARLY_DB_RETENTION: 3650
+      IWB_DAILY_HTML_RETENTION: 2 #in days, save 2 days
+      IWB_WEEKLY_HTML_RETENTION: 28
+      IWB_MONTHLY_HTML_RETENTION: 60
+      IWB_YEARLY_HTML_RETENTION: 365
+      DATASET_HTML_OVERWRITE: [yes,no]
+      DATASET_DB_OVERWRITE: [yes,no]
+      DATASET_DB_IMPORT: [yes,no]
+    volumes:
+      - wordpress:/var/www/html
+      ## For a bind mount to local storage use:
+      ## comment out - wordpress:/var/www/html
+      ## configure and uncomment out the line below:
+      ##- path/to/folder/wordpress:/var/www/html
+      ##- ~/development/docker-bind-mounts/PID:/var/www/html
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: [database name for your wordpress (same as above)]
+      MYSQL_USER: [database user name (same as above)]
+      MYSQL_PASSWORD: [database password (same as above)]
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  wordpress:
+  db:
